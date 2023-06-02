@@ -1,0 +1,51 @@
+doctype html
+html(lang='en')
+  head
+    title Todos List
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css')
+    script(src='https://unpkg.com/htmx.org@1.5.0')
+    style.
+      body {padding: 20px}
+      table {border-radius: 8px; overflow: hidden}
+      tr.htmx-swapping td {opacity: 0.5; transition: opacity 0.3s ease-out;}
+      .customize-title-input {background: transparent; border: none;}
+      .completed-title-text {text-decoration: line-through;}
+      .completed-title-text:focus {text-decoration: none;}
+  body
+    h1 Todos List
+    form(hx-post="/" hx-swap="afterbegin" hx-target="#new-todo" class="mb-3")
+      input(type="text" placeholder="Todo Title" name="title" class="form-control mb-3" required)
+      button(type="submit" class="btn btn-primary") Add todo
+    table(class="table table-light")
+      thead
+        tr
+          th Todo Title
+          th Completed
+          th Actions
+      tbody(id="new-todo" hx-target="closest tr" hx-swap="outerHTML swap:0.3s")
+        each todo in todos
+          tr(class={'table-info': todo.completed})
+            td
+              input(
+                type="text"
+                name="title"
+                hx-put=`/${todo.id}`
+                value=todo.title
+                class={
+                  'completed-title-text': todo.completed,
+                  'form-control': true,
+                  'customize-title-input': true,
+                }
+                hx-include="closest tr"
+              )
+            td
+              input(
+                type="checkbox"
+                name="completed"
+                hx-put=`/${todo.id}`
+                hx-include="closest tr"
+                checked=todo.completed
+                class="form-check-input"
+              )
+            td
+              button(hx-delete=`/${todo.id}` class="btn btn-secondary") Delete
